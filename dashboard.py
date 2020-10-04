@@ -13,6 +13,10 @@ new_df['count']=pd.Series(covid_paper_df['Title'].groupby(covid_paper_df.index).
 new_df.sort_index(inplace=True)
 
 
+abstract_unc_df = pd.read_csv("Articles_and_uncertainty.csv")
+to_plot_data = abstract_unc_df[["Date", "Uncertainty"]].groupby("Date").mean()
+
+
 mortality_df = pd.read_csv("COVID-19_Impact/Mortality_rates.csv")
 mortality_df.set_index("Country/Region", inplace=True)
 countries_list = list(mortality_df.index)
@@ -33,7 +37,7 @@ app.layout = html.Div([
 									figure={
 											'data':[
 											
-											{'x': new_df.index , 'y': new_df['count'], 'type': 'line', 'name': "Count of paper published"},
+											{'x': new_df.index , 'y': new_df['count'], 'type': 'bar', 'name': "Count of paper published"},
 											],
 									
 											'layout':{
@@ -45,7 +49,27 @@ app.layout = html.Div([
 											})
         							]),
 					        ]),
-
+					    html.Div([
+					        html.Div([
+					            html.H3('Uncertainty expressed in Research Papers Published during Corona Period'),
+								dcc.Graph(
+									id = "uncertainty",
+									figure={
+											'data':[
+											
+											{'x': to_plot_data.index , 'y': to_plot_data['Uncertainty'][2:], 'type': 'line', 'name': "Uncertainty in Papers"},
+											],
+									
+											'layout':{
+											'title': 'Uncertainty expressed in Research Papers',
+											'xaxis': {'title': "Time"},
+											# 'xaxis_tickformat' :'%d %B (%a)<br>%Y',
+											'yaxis': {'title': "Percentage of uncertainty"}
+											}
+											
+											})
+        							]),
+					        ]),
 
         html.Div([
 	        dcc.Dropdown(
@@ -67,7 +91,7 @@ app.layout = html.Div([
         
         html.Div(id='output-graph')
 
-])
+], style={'font-family': "Comic Sans MS"})
 
 @app.callback(
 	Output(component_id='output-graph', component_property='children'),
