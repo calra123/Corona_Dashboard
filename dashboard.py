@@ -26,6 +26,7 @@ recovery_df.set_index("Country/Region", inplace=True)
 
 
 app = dash.Dash(__name__)
+server = app.server
 
 
 app.layout = html.Div([
